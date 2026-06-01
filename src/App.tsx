@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BottomNav, type TabKey } from "./components/BottomNav";
 import { ParticipantsTab } from "./components/ParticipantsTab";
 import { PlayerActionSheet } from "./components/PlayerActionSheet";
+import { TeamTab } from "./components/TeamTab";
 import { autoAssign } from "./domain/assignment";
 import { defaultRoster } from "./domain/defaultRoster";
 import { createMatchDay, finishQuarter, markPresent, setPlayerStatus } from "./domain/session";
@@ -29,6 +30,11 @@ export default function App() {
     setSelectedPlayer(null);
   };
 
+  const handleAutoAssign = () => {
+    setSession((current) => autoAssign(current));
+    setActiveTab("teamA");
+  };
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -40,12 +46,12 @@ export default function App() {
         <ParticipantsTab
           session={session}
           onPlayerTap={handlePlayerTap}
-          onAutoAssign={() => setSession((current) => autoAssign(current))}
+          onAutoAssign={handleAutoAssign}
           onFinishQuarter={() => setSession((current) => finishQuarter(current))}
         />
       )}
-      {activeTab === "teamA" && <section className="tab-panel">A팀 전술판 준비 중</section>}
-      {activeTab === "teamB" && <section className="tab-panel">B팀 전술판 준비 중</section>}
+      {activeTab === "teamA" && <TeamTab session={session} side="A" />}
+      {activeTab === "teamB" && <TeamTab session={session} side="B" />}
 
       <PlayerActionSheet playerName={selectedPlayer} onClose={() => setSelectedPlayer(null)} onStatus={handleStatus} />
       <BottomNav activeTab={activeTab} onChange={setActiveTab} />
