@@ -14,6 +14,14 @@ const statusLabels = {
   departed: "이탈"
 };
 
+const positionLabels = {
+  random: "랜덤",
+  defense: "수비",
+  midfield: "미드",
+  attack: "공격",
+  keeper: "GK"
+};
+
 function formatPlayerLabel(name: string, fieldQuarters: number) {
   return fieldQuarters > 0 ? `${name} (${fieldQuarters})` : name;
 }
@@ -58,6 +66,7 @@ export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQu
               </span>
               <span className="player-card__meta">
                 <span>#{player.arrivalOrder ?? "-"}</span>
+                <span>{positionLabels[player.preferredPosition]}</span>
                 <span>F {player.fieldQuarters}</span>
                 <span>GK {player.keeperQuarters}</span>
               </span>

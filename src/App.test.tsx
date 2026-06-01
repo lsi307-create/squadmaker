@@ -123,4 +123,15 @@ describe("App", () => {
     expect(screen.getByText("현재 2쿼터")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /김안종/ })).toBeInTheDocument();
   });
+
+  it("lets a manager choose a preferred position from the player sheet", () => {
+    const { container } = render(<App />);
+    const playerCards = Array.from(container.querySelectorAll<HTMLButtonElement>(".player-card"));
+
+    fireEvent.click(playerCards[0]);
+    fireEvent.click(playerCards[0]);
+    fireEvent.click(screen.getByRole("button", { name: "공격 선호" }));
+
+    expect(screen.getByRole("button", { name: "공격 선호" })).toHaveClass("is-active");
+  });
 });

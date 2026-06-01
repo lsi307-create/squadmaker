@@ -62,4 +62,15 @@ describe("autoAssign", () => {
     expect(session.assignments.bench).not.toContain("선수23");
     expect(session.assignments.bench).not.toContain("선수24");
   });
+
+  it("moves previous goalkeepers behind other goalkeeper candidates", () => {
+    let session = createMatchDay(Array.from({ length: 24 }, (_, index) => `선수${index + 1}`));
+    for (const name of session.roster) session = markPresent(session, name);
+
+    session = finishQuarter(autoAssign(session));
+    session = autoAssign(session);
+
+    expect(Object.values(session.assignments.goalkeepers)).not.toContain("선수21");
+    expect(Object.values(session.assignments.goalkeepers)).not.toContain("선수22");
+  });
 });

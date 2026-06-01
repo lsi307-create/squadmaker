@@ -9,11 +9,12 @@ import {
   createMatchDay,
   finishQuarter,
   markPresent,
+  setPreferredPosition,
   setPlayerStatus,
   setTeamFormation,
   swapAssignedPlayers
 } from "./domain/session";
-import type { Formation, PlayerStatus, TeamSide } from "./domain/types";
+import type { Formation, PlayerStatus, PreferredPosition, TeamSide } from "./domain/types";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabKey>("participants");
@@ -35,6 +36,12 @@ export default function App() {
 
     setSession((current) => setPlayerStatus(current, selectedPlayer, status));
     setSelectedPlayer(null);
+  };
+
+  const handlePreferredPosition = (position: PreferredPosition) => {
+    if (!selectedPlayer) return;
+
+    setSession((current) => setPreferredPosition(current, selectedPlayer, position));
   };
 
   const handleAutoAssign = () => {
@@ -94,7 +101,13 @@ export default function App() {
         />
       )}
 
-      <PlayerActionSheet playerName={selectedPlayer} onClose={() => setSelectedPlayer(null)} onStatus={handleStatus} />
+      <PlayerActionSheet
+        playerName={selectedPlayer}
+        preferredPosition={selectedPlayer ? session.players[selectedPlayer]?.preferredPosition ?? "random" : "random"}
+        onClose={() => setSelectedPlayer(null)}
+        onStatus={handleStatus}
+        onPreferredPosition={handlePreferredPosition}
+      />
       <BottomNav activeTab={activeTab} onChange={setActiveTab} />
     </main>
   );

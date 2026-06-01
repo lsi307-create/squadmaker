@@ -1,4 +1,4 @@
-import type { Formation, MatchDaySession, TeamSide } from "./types";
+import type { Formation, MatchDaySession, PreferredPosition, TeamSide } from "./types";
 
 export interface FormationSlot {
   role: string;
@@ -54,6 +54,44 @@ export const formationSlots: Record<Formation, FormationSlot[]> = {
 };
 
 export const supportedFormations: Formation[] = ["433", "4231", "532"];
+
+function roleGroup(role: string): PreferredPosition {
+  if (role === "GK") return "keeper";
+  if (["LB", "LCB", "CB", "RCB", "RB", "LWB", "RWB"].includes(role)) return "defense";
+  if (["LW", "ST", "RW", "LST", "RST"].includes(role)) return "attack";
+  return "midfield";
+}
+
+export function orderFieldPlayersForFormation(
+  session: MatchDaySession,
+  fieldPlayers: string[],
+  formation: Formation
+): string[] {
+  const remaining = [...fieldPlayers];
+  const ordered: string[] = [];
+  const fieldSlots = formationSlots[formation].filter((slot) => slot.role !== "GK");
+
+  for (const slot of fieldSlots) {
+    const group = roleGroup(slot.role);
+    const preferredIndex = remaining.findIndex((name) => session.players[name]?.preferredPosition === group);
+    const randomIndex = remaining.findIndex((name) => session.players[name]?.preferredPosition === "random");
+    const nextIndex = preferredIndex >= 0 ? preferredIndex : randomIndex >= 0 ? randomIndex : 0;
+    const [nextPlayer] = remaining.splice(nextIndex, 1);
+
+    if (nextPlayer) ordered.push(nextPlayer);
+  }
+
+  return [...ordered, ...remaining];
+}
+
+export function orderTeamForFormation(session: MatchDaySession, side: TeamSide, formation: Formation): string[] {
+  const team = side === "A" ? session.assignments.teamA : session.assignments.teamB;
+  const keeper = session.assignments.goalkeepers[side];
+  const fieldPlayers = team.filter((name) => name !== keeper);
+  const orderedFieldPlayers = orderFieldPlayersForFormation(session, fieldPlayers, formation);
+
+  return keeper ? [...orderedFieldPlayers, keeper] : orderedFieldPlayers;
+}
 
 export function getFormationLineup(session: MatchDaySession, side: TeamSide): FormationLineupSlot[] {
   const team = side === "A" ? session.assignments.teamA : session.assignments.teamB;

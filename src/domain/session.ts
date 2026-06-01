@@ -1,4 +1,5 @@
-import type { Formation, MatchDaySession, PlayerRecord, PlayerStatus, TeamSide } from "./types";
+import { orderTeamForFormation } from "./formations";
+import type { Formation, MatchDaySession, PlayerRecord, PlayerStatus, PreferredPosition, TeamSide } from "./types";
 
 function createPlayer(name: string): PlayerRecord {
   return {
@@ -8,7 +9,8 @@ function createPlayer(name: string): PlayerRecord {
     fieldQuarters: 0,
     keeperQuarters: 0,
     wasKeeperLastQuarter: false,
-    nextFieldPriority: false
+    nextFieldPriority: false,
+    preferredPosition: "random"
   };
 }
 
@@ -68,11 +70,40 @@ export function setPlayerStatus(
 }
 
 export function setTeamFormation(session: MatchDaySession, side: TeamSide, formation: Formation): MatchDaySession {
-  return {
+  const updatedSession = {
     ...session,
     formations: {
       ...session.formations,
       [side]: formation
+    }
+  };
+  const teamKey = side === "A" ? "teamA" : "teamB";
+
+  return {
+    ...updatedSession,
+    assignments: {
+      ...updatedSession.assignments,
+      [teamKey]: orderTeamForFormation(updatedSession, side, formation)
+    }
+  };
+}
+
+export function setPreferredPosition(
+  session: MatchDaySession,
+  name: string,
+  preferredPosition: PreferredPosition
+): MatchDaySession {
+  const player = session.players[name];
+  if (!player) return session;
+
+  return {
+    ...session,
+    players: {
+      ...session.players,
+      [name]: {
+        ...player,
+        preferredPosition
+      }
     }
   };
 }

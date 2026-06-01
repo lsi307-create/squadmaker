@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { autoAssign } from "./assignment";
 import { getFormationLineup, formationSlots } from "./formations";
-import { createMatchDay, markPresent, setTeamFormation } from "./session";
+import { createMatchDay, markPresent, setPreferredPosition, setTeamFormation } from "./session";
 
 describe("formations", () => {
   it("defines 11 slots for each supported formation", () => {
@@ -33,5 +33,17 @@ describe("formations", () => {
 
     expect(lineup.map((slot) => slot.role)).toContain("LWB");
     expect(lineup.map((slot) => slot.role)).toContain("RST");
+  });
+
+  it("places preferred attackers into attacking slots when possible", () => {
+    let session = createMatchDay(Array.from({ length: 22 }, (_, index) => `선수${index + 1}`));
+    for (const name of session.roster) session = markPresent(session, name);
+    session = setPreferredPosition(session, "선수1", "attack");
+    session = autoAssign(session);
+
+    const lineup = getFormationLineup(session, "A");
+    const playerSlot = lineup.find((slot) => slot.playerName === "선수1");
+
+    expect(["LW", "ST", "RW"]).toContain(playerSlot?.role);
   });
 });

@@ -213,6 +213,37 @@ button {
   font-weight: 900;
 }
 
+.sheet-current-position {
+  margin: 8px 0 0;
+  color: #8fa3bd;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sheet-current-position strong {
+  color: #26e6bf;
+}
+
+.position-preference {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.position-preference button {
+  min-height: 38px;
+  padding: 0 4px;
+  color: #c9d8eb;
+  background: #0d1a2b;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 12px;
+}
+
+.position-preference button.is-active {
+  color: #07111f;
+  background: #26e6bf;
+}
+
 .action-sheet .ghost-button {
   color: #eef4ff;
   background: #1f3047;

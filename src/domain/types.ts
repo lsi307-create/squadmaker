@@ -1,6 +1,7 @@
 export type PlayerStatus = "roster" | "active" | "temporarilyOut" | "departed";
 export type TeamSide = "A" | "B";
 export type Formation = "433" | "4231" | "532";
+export type PreferredPosition = "random" | "defense" | "midfield" | "attack" | "keeper";
 
 export interface PlayerRecord {
   name: string;
@@ -10,6 +11,7 @@ export interface PlayerRecord {
   keeperQuarters: number;
   wasKeeperLastQuarter: boolean;
   nextFieldPriority: boolean;
+  preferredPosition: PreferredPosition;
 }
 
 export interface TeamAssignments {
