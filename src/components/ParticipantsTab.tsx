@@ -14,6 +14,10 @@ const statusLabels = {
   departed: "이탈"
 };
 
+function formatPlayerLabel(name: string, fieldQuarters: number) {
+  return fieldQuarters > 0 ? `${name} (${fieldQuarters})` : name;
+}
+
 export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQuarter }: ParticipantsTabProps) {
   const activeCount = Object.values(session.players).filter((player) => player.status === "active").length;
 
@@ -49,7 +53,7 @@ export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQu
               onClick={() => onPlayerTap(name)}
             >
               <span className="player-card__main">
-                <strong>{name}</strong>
+                <strong>{formatPlayerLabel(name, player.fieldQuarters)}</strong>
                 <small>{statusLabels[player.status]}</small>
               </span>
               <span className="player-card__meta">

@@ -12,9 +12,19 @@ export function autoAssign(session: MatchDaySession): MatchDaySession {
     .filter((player) => player.status === "active")
     .sort((a, b) => assignmentScore(a) - assignmentScore(b));
 
-  const fieldPlayers = activePlayers.slice(0, 22).map((player) => player.name);
-  const teamA = fieldPlayers.filter((_, index) => index % 2 === 0).slice(0, 11);
-  const teamB = fieldPlayers.filter((_, index) => index % 2 === 1).slice(0, 11);
+  const fieldPlayers = activePlayers.slice(0, 20).map((player) => player.name);
+  const teamAFields = fieldPlayers.filter((_, index) => index % 2 === 0).slice(0, 10);
+  const teamBFields = fieldPlayers.filter((_, index) => index % 2 === 1).slice(0, 10);
+  const assignedFieldNames = new Set([...teamAFields, ...teamBFields]);
+  const keeperCandidates = activePlayers.filter((player) => !assignedFieldNames.has(player.name));
+  const keeperA = keeperCandidates[0]?.name;
+  const keeperB = keeperCandidates[1]?.name;
+  const teamA = keeperA ? [...teamAFields, keeperA] : teamAFields;
+  const teamB = keeperB ? [...teamBFields, keeperB] : teamBFields;
+  const goalkeepers = {
+    ...(keeperA ? { A: keeperA } : {}),
+    ...(keeperB ? { B: keeperB } : {})
+  };
   const bench = activePlayers
     .filter((player) => !teamA.includes(player.name) && !teamB.includes(player.name))
     .map((player) => player.name);
@@ -26,10 +36,7 @@ export function autoAssign(session: MatchDaySession): MatchDaySession {
       teamA,
       teamB,
       bench,
-      goalkeepers: {
-        A: teamA[0],
-        B: teamB[0]
-      }
+      goalkeepers
     }
   };
 }

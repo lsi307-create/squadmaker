@@ -5,7 +5,14 @@ import { PlayerActionSheet } from "./components/PlayerActionSheet";
 import { TeamTab } from "./components/TeamTab";
 import { autoAssign } from "./domain/assignment";
 import { defaultRoster } from "./domain/defaultRoster";
-import { createMatchDay, finishQuarter, markPresent, setPlayerStatus, setTeamFormation } from "./domain/session";
+import {
+  createMatchDay,
+  finishQuarter,
+  markPresent,
+  setPlayerStatus,
+  setTeamFormation,
+  swapAssignedPlayers
+} from "./domain/session";
 import type { Formation, PlayerStatus, TeamSide } from "./domain/types";
 
 export default function App() {
@@ -35,8 +42,20 @@ export default function App() {
     setActiveTab("teamA");
   };
 
+  const handleRecommendNextQuarter = () => {
+    setSession((current) => autoAssign(current));
+  };
+
   const handleFormationChange = (side: TeamSide, formation: Formation) => {
     setSession((current) => setTeamFormation(current, side, formation));
+  };
+
+  const handleSwapPlayers = (side: TeamSide, firstPlayerName: string, secondPlayerName: string) => {
+    setSession((current) => swapAssignedPlayers(current, side, firstPlayerName, secondPlayerName));
+  };
+
+  const handleFinishQuarter = () => {
+    setSession((current) => finishQuarter(current));
   };
 
   return (
@@ -51,11 +70,29 @@ export default function App() {
           session={session}
           onPlayerTap={handlePlayerTap}
           onAutoAssign={handleAutoAssign}
-          onFinishQuarter={() => setSession((current) => finishQuarter(current))}
+          onFinishQuarter={handleFinishQuarter}
         />
       )}
-      {activeTab === "teamA" && <TeamTab session={session} side="A" onFormationChange={handleFormationChange} />}
-      {activeTab === "teamB" && <TeamTab session={session} side="B" onFormationChange={handleFormationChange} />}
+      {activeTab === "teamA" && (
+        <TeamTab
+          session={session}
+          side="A"
+          onFinishQuarter={handleFinishQuarter}
+          onRecommendNextQuarter={handleRecommendNextQuarter}
+          onFormationChange={handleFormationChange}
+          onSwapPlayers={handleSwapPlayers}
+        />
+      )}
+      {activeTab === "teamB" && (
+        <TeamTab
+          session={session}
+          side="B"
+          onFinishQuarter={handleFinishQuarter}
+          onRecommendNextQuarter={handleRecommendNextQuarter}
+          onFormationChange={handleFormationChange}
+          onSwapPlayers={handleSwapPlayers}
+        />
+      )}
 
       <PlayerActionSheet playerName={selectedPlayer} onClose={() => setSelectedPlayer(null)} onStatus={handleStatus} />
       <BottomNav activeTab={activeTab} onChange={setActiveTab} />

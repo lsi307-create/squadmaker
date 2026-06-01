@@ -77,6 +77,40 @@ export function setTeamFormation(session: MatchDaySession, side: TeamSide, forma
   };
 }
 
+export function swapAssignedPlayers(
+  session: MatchDaySession,
+  side: TeamSide,
+  firstPlayerName: string,
+  secondPlayerName: string
+): MatchDaySession {
+  if (firstPlayerName === secondPlayerName) return session;
+
+  const teamKey = side === "A" ? "teamA" : "teamB";
+  const team = session.assignments[teamKey];
+  if (!team.includes(firstPlayerName) || !team.includes(secondPlayerName)) return session;
+
+  const swappedTeam = team.map((name) => {
+    if (name === firstPlayerName) return secondPlayerName;
+    if (name === secondPlayerName) return firstPlayerName;
+    return name;
+  });
+  const currentKeeper = session.assignments.goalkeepers[side];
+  const nextKeeper =
+    currentKeeper === firstPlayerName ? secondPlayerName : currentKeeper === secondPlayerName ? firstPlayerName : currentKeeper;
+
+  return {
+    ...session,
+    assignments: {
+      ...session.assignments,
+      [teamKey]: swappedTeam,
+      goalkeepers: {
+        ...session.assignments.goalkeepers,
+        [side]: nextKeeper
+      }
+    }
+  };
+}
+
 export function finishQuarter(session: MatchDaySession): MatchDaySession {
   const keeperNames = new Set(Object.values(session.assignments.goalkeepers).filter(Boolean));
   const fieldNames = [...session.assignments.teamA, ...session.assignments.teamB].filter(
