@@ -52,4 +52,24 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: "B팀" })).toBeInTheDocument();
     expect(screen.getByText("B팀 11명")).toBeInTheDocument();
   });
+
+  it("places assigned players on a formation board and changes formation", () => {
+    const { container } = render(<App />);
+    const playerCards = Array.from(container.querySelectorAll<HTMLButtonElement>(".player-card"));
+
+    for (const playerCard of playerCards.slice(0, 22)) {
+      fireEvent.click(playerCard);
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: "자동 배정" }));
+
+    expect(screen.getByLabelText("A팀 포메이션 보드")).toBeInTheDocument();
+    expect(screen.getByText("GK")).toBeInTheDocument();
+    expect(screen.getByText("ST")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "532" }));
+
+    expect(screen.getByText("LWB")).toBeInTheDocument();
+    expect(screen.getByText("RST")).toBeInTheDocument();
+  });
 });

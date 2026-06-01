@@ -1,4 +1,4 @@
-import type { MatchDaySession, PlayerRecord, PlayerStatus } from "./types";
+import type { Formation, MatchDaySession, PlayerRecord, PlayerStatus, TeamSide } from "./types";
 
 function createPlayer(name: string): PlayerRecord {
   return {
@@ -64,6 +64,16 @@ export function setPlayerStatus(
       }
     },
     nextArrivalOrder: player.arrivalOrder ? session.nextArrivalOrder : session.nextArrivalOrder + 1
+  };
+}
+
+export function setTeamFormation(session: MatchDaySession, side: TeamSide, formation: Formation): MatchDaySession {
+  return {
+    ...session,
+    formations: {
+      ...session.formations,
+      [side]: formation
+    }
   };
 }
 
