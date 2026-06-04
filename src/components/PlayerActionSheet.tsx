@@ -48,24 +48,27 @@ export function PlayerActionSheet({
               className={preferredPosition === option.value ? "is-active" : ""}
               key={option.value}
               type="button"
+              aria-label={option.actionLabel}
               onClick={() => onPreferredPosition(option.value)}
             >
-              {option.actionLabel}
+              {option.label}
             </button>
           ))}
         </div>
-        <button type="button" onClick={() => onStatus("temporarilyOut")}>
-          잠시 제외
-        </button>
-        <button type="button" onClick={() => onStatus("active")}>
-          복귀
-        </button>
-        <button type="button" onClick={() => onStatus("departed")}>
-          오늘 이탈
-        </button>
-        <button className="ghost-button" type="button" onClick={onClose}>
-          닫기
-        </button>
+        <div className="sheet-actions">
+          <button className="warning-button" type="button" onClick={() => onStatus("temporarilyOut")}>
+            잠시 제외
+          </button>
+          <button type="button" onClick={() => onStatus("active")}>
+            복귀
+          </button>
+          <button className="danger-button" type="button" onClick={() => onStatus("departed")}>
+            오늘 이탈
+          </button>
+          <button className="ghost-button" type="button" onClick={onClose}>
+            닫기
+          </button>
+        </div>
       </section>
     </div>
   );

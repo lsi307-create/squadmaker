@@ -30,23 +30,19 @@ export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQu
   const activeCount = Object.values(session.players).filter((player) => player.status === "active").length;
 
   return (
-    <section className="tab-panel">
-      <div className="summary-strip">
-        <div>
+    <section className="tab-panel participants-tab">
+      <div className="match-control-strip">
+        <div className="match-stat">
           <span>현재 쿼터</span>
           <strong>{session.currentQuarter}</strong>
         </div>
-        <div>
+        <div className="match-stat">
           <span>출석</span>
           <strong>{activeCount}</strong>
         </div>
-      </div>
-      <div className="quick-actions">
-        <button type="button" onClick={onAutoAssign}>
-          자동 배정
-        </button>
-        <button type="button" onClick={onFinishQuarter}>
-          쿼터 종료
+        <button className="recommend-action" type="button" aria-label="자동 배정" onClick={onAutoAssign}>
+          <span>추천</span>
+          <strong>배정</strong>
         </button>
       </div>
       <div className="player-list">
@@ -65,15 +61,16 @@ export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQu
                 <small>{statusLabels[player.status]}</small>
               </span>
               <span className="player-card__meta">
-                <span>#{player.arrivalOrder ?? "-"}</span>
-                <span>{positionLabels[player.preferredPosition]}</span>
+                <span>#{player.arrivalOrder ?? "-"} · {positionLabels[player.preferredPosition]}</span>
                 <span>F {player.fieldQuarters}</span>
-                <span>GK {player.keeperQuarters}</span>
               </span>
             </button>
           );
         })}
       </div>
+      <button className="floating-quarter-button" type="button" onClick={onFinishQuarter}>
+        쿼터 종료
+      </button>
     </section>
   );
 }
