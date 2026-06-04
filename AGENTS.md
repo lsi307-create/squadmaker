@@ -4,20 +4,21 @@
 
 Use these docs before changing behavior:
 
-- Product/admin context: `docs/guides/squadmaker-v2-admin-guide.md`
-- Current update log: `docs/guides/squadmaker-v2-update-log.md`
-- Compound learning store: `docs/solutions/`
-- Original implementation plan: `docs/superpowers/plans/2026-06-02-squadmaker-v2-implementation.md`
+- Archived product/admin context: `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\guides\squadmaker-v2-admin-guide.md`
+- Archived current update log: `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\guides\squadmaker-v2-update-log.md`
+- Archived Compound learning store: `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\solutions\`
+- Archived original implementation plan: `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\superpowers\plans\2026-06-02-squadmaker-v2-implementation.md`
+- Lightweight pointer in repo: `docs/README.md`
 
 ## Compound Engineering Loop
 
 After each meaningful feature, bug fix, real-use test, or deployment:
 
-1. Add or update one focused note under `docs/solutions/`.
-2. Update `docs/guides/squadmaker-v2-update-log.md` when user-facing behavior changed.
-3. Keep the admin guide current if the operating workflow changed.
+1. Add or update one focused note under `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\solutions\`.
+2. Update `E:\CodexSync\squadmaker-v2\2026-06-05-docs-logs\docs\guides\squadmaker-v2-update-log.md` when user-facing behavior changed.
+3. Keep the archived admin guide current if the operating workflow changed.
 4. Run fresh verification before claiming completion.
-5. Commit the documentation with the code change when possible.
+5. Keep only lightweight pointers in the repo unless the user asks to bring docs back onto C drive.
 
 ## Product Rules To Preserve
 
