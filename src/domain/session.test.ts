@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createMatchDay, finishQuarter, markPresent, setPlayerStatus } from "./session";
+import { createMatchDay, finishQuarter, markPresent, setPlayerStatus, substituteWithBench } from "./session";
 
 describe("match-day session", () => {
   it("assigns arrival order when players are marked present", () => {
@@ -39,5 +39,22 @@ describe("match-day session", () => {
     expect(session.players["김재윤"].fieldQuarters).toBe(1);
     expect(session.players["김재윤"].keeperQuarters).toBe(0);
     expect(session.players["김진우"].nextFieldPriority).toBe(true);
+  });
+
+  it("swaps a lineup player with a bench player", () => {
+    let session = createMatchDay(["김은규", "김재윤", "김진우", "최정호"]);
+    for (const name of session.roster) session = markPresent(session, name);
+    session.assignments = {
+      teamA: ["김은규", "김재윤"],
+      teamB: [],
+      bench: ["김진우", "최정호"],
+      goalkeepers: { A: "김은규" }
+    };
+
+    session = substituteWithBench(session, "A", "김은규", "김진우");
+
+    expect(session.assignments.teamA).toEqual(["김진우", "김재윤"]);
+    expect(session.assignments.bench).toEqual(["김은규", "최정호"]);
+    expect(session.assignments.goalkeepers.A).toBe("김진우");
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { autoAssign } from "./assignment";
-import { getFormationLineup, formationSlots } from "./formations";
+import { getFormationLineup, getRoleGroup, formationSlots } from "./formations";
 import { createMatchDay, markPresent, setPreferredPosition, setTeamFormation } from "./session";
 
 describe("formations", () => {
@@ -45,5 +45,12 @@ describe("formations", () => {
     const playerSlot = lineup.find((slot) => slot.playerName === "선수1");
 
     expect(["LW", "ST", "RW"]).toContain(playerSlot?.role);
+  });
+
+  it("classifies formation roles into keeper, defense, midfield, and attack groups", () => {
+    expect(getRoleGroup("GK")).toBe("keeper");
+    expect(getRoleGroup("LB")).toBe("defense");
+    expect(getRoleGroup("CM")).toBe("midfield");
+    expect(getRoleGroup("ST")).toBe("attack");
   });
 });

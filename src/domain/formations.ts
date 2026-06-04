@@ -55,7 +55,7 @@ export const formationSlots: Record<Formation, FormationSlot[]> = {
 
 export const supportedFormations: Formation[] = ["433", "4231", "532"];
 
-function roleGroup(role: string): PreferredPosition {
+export function getRoleGroup(role: string): PreferredPosition {
   if (role === "GK") return "keeper";
   if (["LB", "LCB", "CB", "RCB", "RB", "LWB", "RWB"].includes(role)) return "defense";
   if (["LW", "ST", "RW", "LST", "RST"].includes(role)) return "attack";
@@ -72,7 +72,7 @@ export function orderFieldPlayersForFormation(
   const fieldSlots = formationSlots[formation].filter((slot) => slot.role !== "GK");
 
   for (const slot of fieldSlots) {
-    const group = roleGroup(slot.role);
+    const group = getRoleGroup(slot.role);
     const preferredIndex = remaining.findIndex((name) => session.players[name]?.preferredPosition === group);
     const randomIndex = remaining.findIndex((name) => session.players[name]?.preferredPosition === "random");
     const nextIndex = preferredIndex >= 0 ? preferredIndex : randomIndex >= 0 ? randomIndex : 0;

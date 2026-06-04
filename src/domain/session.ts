@@ -142,6 +142,38 @@ export function swapAssignedPlayers(
   };
 }
 
+export function substituteWithBench(
+  session: MatchDaySession,
+  side: TeamSide,
+  lineupPlayerName: string,
+  benchPlayerName: string
+): MatchDaySession {
+  if (lineupPlayerName === benchPlayerName) return session;
+
+  const teamKey = side === "A" ? "teamA" : "teamB";
+  const team = session.assignments[teamKey];
+  const bench = session.assignments.bench;
+  if (!team.includes(lineupPlayerName) || !bench.includes(benchPlayerName)) return session;
+
+  const nextTeam = team.map((name) => (name === lineupPlayerName ? benchPlayerName : name));
+  const nextBench = bench.map((name) => (name === benchPlayerName ? lineupPlayerName : name));
+  const currentKeeper = session.assignments.goalkeepers[side];
+  const nextKeeper = currentKeeper === lineupPlayerName ? benchPlayerName : currentKeeper;
+
+  return {
+    ...session,
+    assignments: {
+      ...session.assignments,
+      [teamKey]: nextTeam,
+      bench: nextBench,
+      goalkeepers: {
+        ...session.assignments.goalkeepers,
+        [side]: nextKeeper
+      }
+    }
+  };
+}
+
 export function finishQuarter(session: MatchDaySession): MatchDaySession {
   const keeperNames = new Set(Object.values(session.assignments.goalkeepers).filter(Boolean));
   const fieldNames = [...session.assignments.teamA, ...session.assignments.teamB].filter(

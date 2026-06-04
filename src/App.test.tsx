@@ -134,4 +134,58 @@ describe("App", () => {
 
     expect(screen.getByRole("button", { name: "공격 선호" })).toHaveClass("is-active");
   });
+
+  it("filters the participant roster by search text", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(screen.getByRole("searchbox", { name: "참여인원 검색" }), "김재윤");
+
+    expect(screen.getByRole("button", { name: /김재윤/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /김은규/ })).not.toBeInTheDocument();
+  });
+
+  it("shows the cleaned 김용삼 roster entry without the duplicate numbered entry", () => {
+    render(<App />);
+
+    expect(screen.getByRole("button", { name: /김용삼/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /김용삼1/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /김용삼2/ })).not.toBeInTheDocument();
+  });
+
+  it("substitutes a selected lineup player with a selected bench player", () => {
+    const { container } = render(<App />);
+    const playerCards = Array.from(container.querySelectorAll<HTMLButtonElement>(".player-card"));
+
+    for (const playerCard of playerCards.slice(0, 23)) {
+      fireEvent.click(playerCard);
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: "자동 배정" }));
+
+    const lineupButton = screen.getByRole("button", { name: /LB 김은규/ });
+    const benchButton = screen.getByRole("button", { name: /대기 김안종/ });
+
+    fireEvent.click(lineupButton);
+    fireEvent.click(benchButton);
+
+    expect(screen.getByRole("button", { name: /LB 김안종/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /대기 김은규/ })).toBeInTheDocument();
+  });
+
+  it("applies fixed team and role color classes to the formation board", () => {
+    const { container } = render(<App />);
+    const playerCards = Array.from(container.querySelectorAll<HTMLButtonElement>(".player-card"));
+
+    for (const playerCard of playerCards.slice(0, 22)) {
+      fireEvent.click(playerCard);
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: "자동 배정" }));
+
+    expect(container.querySelector(".team-tab-A")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^ST / })).toHaveClass("position-attack");
+    expect(screen.getByRole("button", { name: /^CM / })).toHaveClass("position-midfield");
+    expect(screen.getByRole("button", { name: /^LB / })).toHaveClass("position-defense");
+  });
 });

@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { MatchDaySession } from "../domain/types";
 
 interface ParticipantsTabProps {
@@ -27,7 +29,16 @@ function formatPlayerLabel(name: string, fieldQuarters: number) {
 }
 
 export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQuarter }: ParticipantsTabProps) {
+  const [query, setQuery] = useState("");
   const activeCount = Object.values(session.players).filter((player) => player.status === "active").length;
+  const normalizedQuery = query.trim().toLocaleLowerCase("ko-KR");
+  const visibleRoster = useMemo(
+    () =>
+      normalizedQuery
+        ? session.roster.filter((name) => name.toLocaleLowerCase("ko-KR").includes(normalizedQuery))
+        : session.roster,
+    [normalizedQuery, session.roster]
+  );
 
   return (
     <section className="tab-panel participants-tab">
@@ -45,8 +56,19 @@ export function ParticipantsTab({ session, onPlayerTap, onAutoAssign, onFinishQu
           <strong>배정</strong>
         </button>
       </div>
+      <label className="roster-search">
+        <Search size={18} aria-hidden="true" />
+        <input
+          aria-label="참여인원 검색"
+          type="search"
+          placeholder="이름 검색"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
       <div className="player-list">
-        {session.roster.map((name) => {
+        {visibleRoster.length === 0 && <p className="empty-state">검색 결과가 없습니다.</p>}
+        {visibleRoster.map((name) => {
           const player = session.players[name];
 
           return (

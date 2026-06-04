@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getFormationLineup, supportedFormations } from "../domain/formations";
+import { getFormationLineup, getRoleGroup, supportedFormations } from "../domain/formations";
 import type { Formation, MatchDaySession, TeamSide } from "../domain/types";
 
 interface TeamTabProps {
@@ -9,6 +9,7 @@ interface TeamTabProps {
   onRecommendNextQuarter: () => void;
   onFormationChange: (side: TeamSide, formation: Formation) => void;
   onSwapPlayers: (side: TeamSide, firstPlayerName: string, secondPlayerName: string) => void;
+  onSubstituteWithBench: (side: TeamSide, lineupPlayerName: string, benchPlayerName: string) => void;
 }
 
 function formatPlayerLabel(name: string, fieldQuarters: number) {
@@ -21,15 +22,23 @@ export function TeamTab({
   onFinishQuarter,
   onRecommendNextQuarter,
   onFormationChange,
-  onSwapPlayers
+  onSwapPlayers,
+  onSubstituteWithBench
 }: TeamTabProps) {
   const [selectedPlayerName, setSelectedPlayerName] = useState<string | null>(null);
   const team = side === "A" ? session.assignments.teamA : session.assignments.teamB;
   const lineup = getFormationLineup(session, side);
   const formation = session.formations[side];
+  const selectedIsBench = selectedPlayerName ? session.assignments.bench.includes(selectedPlayerName) : false;
+  const selectedIsLineup = selectedPlayerName ? team.includes(selectedPlayerName) : false;
 
   const handlePitchPlayerTap = (playerName: string | null) => {
     if (!playerName) return;
+    if (selectedPlayerName && selectedIsBench) {
+      onSubstituteWithBench(side, playerName, selectedPlayerName);
+      setSelectedPlayerName(null);
+      return;
+    }
     if (!selectedPlayerName) {
       setSelectedPlayerName(playerName);
       return;
@@ -43,15 +52,25 @@ export function TeamTab({
     setSelectedPlayerName(null);
   };
 
+  const handleBenchPlayerTap = (benchPlayerName: string) => {
+    if (selectedPlayerName && selectedIsLineup) {
+      onSubstituteWithBench(side, selectedPlayerName, benchPlayerName);
+      setSelectedPlayerName(null);
+      return;
+    }
+
+    setSelectedPlayerName(selectedPlayerName === benchPlayerName ? null : benchPlayerName);
+  };
+
   return (
-    <section className="tab-panel team-tab" aria-labelledby={`team-${side}-title`}>
+    <section className={`tab-panel team-tab team-tab-${side}`} aria-labelledby={`team-${side}-title`}>
       <div className="team-header">
         <div>
           <p className="eyebrow">포지션 보드</p>
           <h2 id={`team-${side}-title`}>{side}팀</h2>
           <span className="team-subtitle">라인업</span>
         </div>
-        <span className={`team-badge team-badge-${side}`}>{side === "A" ? "레드" : "블루"}</span>
+        <span className={`team-badge team-badge-${side}`}>{side === "A" ? "노랑" : "파랑"}</span>
       </div>
 
       <div className="team-control-strip">
@@ -86,11 +105,14 @@ export function TeamTab({
           const player = slot.playerName ? session.players[slot.playerName] : null;
           const playerLabel = player ? formatPlayerLabel(player.name, player.fieldQuarters) : "빈 자리";
           const isSelected = slot.playerName === selectedPlayerName;
+          const roleGroup = getRoleGroup(slot.role);
 
           return (
             <button
               aria-label={`${slot.role} ${playerLabel}`}
-              className={`pitch-player ${slot.playerName ? "" : "is-empty"} ${isSelected ? "is-selected" : ""}`}
+              className={`pitch-player position-${roleGroup} ${slot.playerName ? "" : "is-empty"} ${
+                isSelected ? "is-selected" : ""
+              }`}
               key={slot.role}
               type="button"
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
@@ -115,27 +137,39 @@ export function TeamTab({
         다음 쿼터 추천
       </button>
 
-      <div className="team-list compact-list">
-        {team.length === 0 ? (
-          <p className="empty-state">참여인원 탭에서 출석자를 선택한 뒤 자동 배정을 눌러주세요.</p>
-        ) : (
-          team.map((name, index) => (
-            <article className="team-player" key={name}>
-              <span className="team-player__number">{index + 1}</span>
-              <span>
-                <strong>{formatPlayerLabel(name, session.players[name].fieldQuarters)}</strong>
-              </span>
-            </article>
-          ))
-        )}
-      </div>
+      <section className="lineup-section" aria-label={`${side}팀 선발 명단`}>
+        <h3>선발 명단</h3>
+        <div className="team-list compact-list">
+          {team.length === 0 ? (
+            <p className="empty-state">참여인원 탭에서 출석자를 선택한 뒤 자동 배정을 눌러주세요.</p>
+          ) : (
+            team.map((name, index) => (
+              <article className={`team-player ${selectedPlayerName === name ? "is-selected" : ""}`} key={name}>
+                <span className="team-player__number">{index + 1}</span>
+                <span>
+                  <strong>{formatPlayerLabel(name, session.players[name].fieldQuarters)}</strong>
+                </span>
+              </article>
+            ))
+          )}
+        </div>
+      </section>
 
       {session.assignments.bench.length > 0 && (
-        <section className="bench-section" aria-label="대기자">
-          <h3>대기</h3>
+        <section className="bench-section" aria-label="대기 명단">
+          <h3>대기 명단</h3>
           <div className="bench-list">
             {session.assignments.bench.map((name) => (
-              <span key={name}>{name}</span>
+              <button
+                className={selectedPlayerName === name ? "is-selected" : ""}
+                key={name}
+                type="button"
+                aria-label={`대기 ${formatPlayerLabel(name, session.players[name].fieldQuarters)}`}
+                onClick={() => handleBenchPlayerTap(name)}
+              >
+                <strong>{formatPlayerLabel(name, session.players[name].fieldQuarters)}</strong>
+                <span>대기</span>
+              </button>
             ))}
           </div>
         </section>

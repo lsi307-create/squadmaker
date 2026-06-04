@@ -12,6 +12,7 @@ import {
   setPreferredPosition,
   setPlayerStatus,
   setTeamFormation,
+  substituteWithBench,
   swapAssignedPlayers
 } from "./domain/session";
 import type { Formation, PlayerStatus, PreferredPosition, TeamSide } from "./domain/types";
@@ -61,6 +62,10 @@ export default function App() {
     setSession((current) => swapAssignedPlayers(current, side, firstPlayerName, secondPlayerName));
   };
 
+  const handleSubstituteWithBench = (side: TeamSide, lineupPlayerName: string, benchPlayerName: string) => {
+    setSession((current) => substituteWithBench(current, side, lineupPlayerName, benchPlayerName));
+  };
+
   const handleFinishQuarter = () => {
     setSession((current) => finishQuarter(current));
   };
@@ -88,6 +93,7 @@ export default function App() {
           onRecommendNextQuarter={handleRecommendNextQuarter}
           onFormationChange={handleFormationChange}
           onSwapPlayers={handleSwapPlayers}
+          onSubstituteWithBench={handleSubstituteWithBench}
         />
       )}
       {activeTab === "teamB" && (
@@ -98,6 +104,7 @@ export default function App() {
           onRecommendNextQuarter={handleRecommendNextQuarter}
           onFormationChange={handleFormationChange}
           onSwapPlayers={handleSwapPlayers}
+          onSubstituteWithBench={handleSubstituteWithBench}
         />
       )}
 
